@@ -16,15 +16,12 @@ impl ActivationFunction {
             ActivationFunction::Sigmoid => z.map(|val| 1.0 / (1.0 + (-val).exp())),
             ActivationFunction::ReLU => z.map(|val| val.max(0.0)),
             ActivationFunction::Softmax => {
-                // Numerically stable softmax
-                // Subtract max for stability before exp
                 let max_val = z.max();
                 let exp_z = z.map(|val| (val - max_val).exp());
-                let sum_exp_z = exp_z.sum(); // Sum of all elements if it's a single sample output
-                                            // If batch, sum over columns for each row
-                if z.ncols() == 1 || z.nrows() == 1 { // Vector case
+                let sum_exp_z = exp_z.sum();
+                if z.ncols() == 1 || z.nrows() == 1 {
                     exp_z / sum_exp_z
-                } else { // Batch case, softmax per row
+                } else {
                     let mut output = DMatrix::zeros(z.nrows(), z.ncols());
                     for r in 0..z.nrows() {
                         let row = z.row(r);

@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>hello-wasm example</title>
+  </head>
+  <body>
+    <script type="module">
+      import init from "./pkg/genius_hour.js";
+      init().then(() => {
+        predict_mnist();
+      });
+    </script>
+  </body>
+</html>
