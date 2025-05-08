@@ -16,7 +16,7 @@ impl LossFunction {
             }
             LossFunction::CrossEntropy => {
                 // Add epsilon to prevent log(0)
-                let epsilon = 1e-12;
+                let epsilon = f32::EPSILON;
                 let clipped_predictions = predictions.map(|p| p.max(epsilon).min(1.0 - epsilon));
                 - (targets.component_mul(&clipped_predictions.map(|p| p.ln()))).sum() / batch_size
             }
@@ -33,12 +33,12 @@ impl LossFunction {
             }
             LossFunction::CrossEntropy => {
                 // Add epsilon to prevent division by zero
-                let epsilon = 1e-12;
+                let epsilon = f32::EPSILON;
                 let clipped_predictions = predictions.map(|p| p.max(epsilon).min(1.0 - epsilon));
                 // dL/dp = - (targets / predictions)
                 // This derivative is w.r.t. p (network output).
                 // If the last layer is Softmax, the combined derivative dL/dz = p - y is simpler.
-                // This function returns dL/dp. The network's backprop handles combining it.
+                // This function returns dL/dp. The network's backprop logic handles combining it.
                  -targets.component_div(&clipped_predictions) / batch_size
             }
         }

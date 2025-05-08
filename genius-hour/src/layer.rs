@@ -14,7 +14,7 @@ pub struct DenseLayer {
 
 impl DenseLayer {
     pub fn new(input_size: usize, output_size: usize, activation_fn: ActivationFunction) -> Self {
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
         
         let std_dev = match activation_fn {
             ActivationFunction::ReLU => (2.0 / input_size as f32).sqrt(),
@@ -39,18 +39,20 @@ impl DenseLayer {
     }
 
     pub fn forward(&mut self, input: &DMatrix<f32>) -> DMatrix<f32> {
+        // Make sure dimensions match, better to catch dimention errors early then deal with errors in operations
         assert_eq!(input.ncols(), self.weights.nrows(), 
             "FORWARD: Input columns ({}) must match weight rows ({}). Input dims: {}x{}, Weight dims: {}x{}", 
             input.ncols(), self.weights.nrows(), 
             input.nrows(), input.ncols(), 
             self.weights.nrows(), self.weights.ncols());
+        // Bad: Clone is expensive
         self.input_cache = input.clone();
         
         let z_linear = input * &self.weights; // (batch_size, output_size)
         
         let bias_row_vector = self.biases.transpose(); // (1, output_size), type RowDVector<f32>
 
-        // Explicitly compute z_linear + bias_row_vector row by row
+        // Compute z_linear + bias_row_vector row by row
         let mut z_biased = DMatrix::zeros(z_linear.nrows(), z_linear.ncols());
         for r_idx in 0..z_linear.nrows() {
             let row_sum = z_linear.row(r_idx) + &bias_row_vector; 
@@ -76,13 +78,11 @@ impl DenseLayer {
         // Calculate gradients for weights: dW = (1/m) * X_prev.T * dZ
         let dw = (&self.input_cache.transpose() * gradient_wrt_z) / batch_size;
 
-        // ---- MANUAL CALCULATION FOR BIAS GRADIENTS (db_col_vector) ----
+        // Calculate gradients for biases: dW = (1/m) * X_prev.T * dZ
         let output_size_for_bias = self.biases.nrows(); // Number of neurons in this layer
         let mut calculated_db_col_vector_data = Vec::with_capacity(output_size_for_bias);
 
         for j in 0..output_size_for_bias { // For each output neuron / bias term
-            // gradient_wrt_z.column(j) gives a ColumnVectorSlice (batch_size, 1)
-            // .sum() on this slice sums its elements (sum over the batch for neuron j)
             let col_j_sum: f32 = gradient_wrt_z.column(j).sum(); 
             calculated_db_col_vector_data.push(col_j_sum / batch_size);
         }
@@ -90,17 +90,16 @@ impl DenseLayer {
         // Create a DVector (column vector) of shape (output_size_for_bias, 1)
         let db_col_vector = DVector::from_vec(calculated_db_col_vector_data);
         
-        // ---- END OF MANUAL CALCULATION ----
-
         // Calculate gradient to pass to the previous layer: dError/dA_prev_layer = dZ * W.T
+        // Transpose weights to match dimensions
         let gradient_to_pass_back = gradient_wrt_z * self.weights.transpose();
         
-        // Check shapes right before the problematic operation
         let bias_update_term = learning_rate * db_col_vector.clone(); // Clone for debug print if needed, use original for op
 
         // Update weights and biases
+        // TODO: This is where we could use momentum, weight decay, etc for a better optimizer
         self.weights -= learning_rate * dw;
-        self.biases -= bias_update_term; // Using the pre-calculated term
+        self.biases -= bias_update_term; 
 
         
         gradient_to_pass_back

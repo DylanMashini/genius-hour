@@ -13,52 +13,39 @@ pub use layer::DenseLayer;
 pub use loss::LossFunction;
 pub use network::NeuralNetwork;
 
+// WASM library caused problems when trying to compile to train, so conditionally exclude it
 #[cfg(target_arch = "wasm32")]
 mod wasm_specific {
-    use super::*; // Make parent module items available
+    use super::*;
     use nalgebra::DMatrix;
     use once_cell::sync::Lazy;
-    use wasm_bindgen::prelude::*; // For global static initialized once
+    use wasm_bindgen::prelude::*;
 
-    // Helper to set panic hook for better WASM debugging (optional)
+    // Debug MOde 
     #[cfg(feature = "dev")]
     #[wasm_bindgen(start)]
     pub fn start() {
         console_error_panic_hook::set_once();
-        // You can add other init logic here if needed when WASM module loads
     }
 
-    // Path to your trained model file (relative to Cargo.toml of this crate)
+    // include_bytes! is a compile time macro that includes the contents of a file as a byte slice.
     const MODEL_BYTES: &[u8] = include_bytes!("../mnist_model.bincode"); // Adjust path if model is elsewhere
 
-    // Global static for the loaded neural network.
-    // Lazy ensures it's loaded only once when first accessed.
+    // Lazy static for the loaded neural network, only loaded when needed, still available in global scope and never double loaded
     static MNIST_NETWORK: Lazy<Result<NeuralNetwork, String>> = Lazy::new(|| {
-        // Deserialize the network from the embedded bytes.
         // We need to specify the LossFunction used during training.
-        // For MNIST with softmax output, it was CrossEntropy.
         match bincode::deserialize(MODEL_BYTES) {
             Ok(serializable_nn) => {
-                let snn: super::serialization::SerializableNeuralNetwork = serializable_nn; // Corrected path
+                let snn: super::serialization::SerializableNeuralNetwork = serializable_nn;
                 Ok(snn.into_neural_network(LossFunction::CrossEntropy))
             }
             Err(e) => Err(format!("Failed to deserialize embedded model: {}", e)),
         }
     });
 
-    // WASM function to initialize and check the model (optional, mostly for testing)
-    #[wasm_bindgen]
-    pub fn ensure_model_loaded() -> Result<(), JsValue> {
-        match &*MNIST_NETWORK {
-            // Access the Lazy static
-            Ok(_) => Ok(()),
-            Err(s) => Err(JsValue::from_str(&format!("Model loading failed: {}", s))),
-        }
-    }
-
     // WASM function to perform prediction.
-    // Input: a flat slice of f32 representing a single flattened image (e.g., 784 pixels).
-    // Output: a Vec<f32> representing the probabilities for each class (e.g., 10 probabilities).
+    // Input: a Float32Array representing a single flattened image (e.g., 784 pixels).
+    // Output: a Float32Array representing the probabilities for each class (e.g., 10 probabilities).
     #[wasm_bindgen]
     pub fn predict_mnist(image_data: &[f32]) -> Result<Vec<f32>, JsValue> {
         // 1. Validate input length
@@ -73,6 +60,7 @@ mod wasm_specific {
 
         use std::cell::RefCell;
 
+        // thread_local! keeps us memory safe while preventing reloading the model
         thread_local! {
             static THREAD_LOCAL_NETWORK: RefCell<Result<NeuralNetwork, String>> = RefCell::new(
                 match bincode::deserialize(MODEL_BYTES) {
@@ -100,27 +88,8 @@ mod wasm_specific {
         })
     }
 
-    #[wasm_bindgen]
-    pub fn get_model_input_size() -> usize {
-        28 * 28
-    }
-
-    #[wasm_bindgen]
-    pub fn get_model_output_size() -> usize {
-        match &*MNIST_NETWORK {
-            Ok(nn) => {
-                if let Some(last_layer) = nn.get_layers().last() {
-                    last_layer.biases.nrows()
-                } else {
-                    0
-                }
-            }
-            Err(_) => 0,
-        }
-    }
 }
 
-// Optional: Re-export WASM specific functions if you want them available at crate::function_name
-// when wasm32 is targeted. Otherwise, they'd be at crate::wasm_specific::function_name
+// Re-export WASM specific functions, as they were placed in their own module
 #[cfg(target_arch = "wasm32")]
 pub use wasm_specific::*;

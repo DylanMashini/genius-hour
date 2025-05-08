@@ -7,7 +7,6 @@ use std::fs::File;
 use std::io::{BufWriter, BufReader};
 use bincode::{serialize_into, deserialize_from};
 
-
 pub struct NeuralNetwork {
     layers: Vec<DenseLayer>,
     loss_fn: LossFunction,
@@ -44,14 +43,14 @@ impl NeuralNetwork {
         targets: &DMatrix<f32>, 
         learning_rate: f32
     ) -> f32 {
-        // --- Forward pass ---
-        // This also caches inputs and z_values in layers
+        // Forward pass
+        // This also caches inputs and z_values in layers, to avoid recalculation
         let predictions = self.predict(inputs); 
 
-        // --- Calculate loss ---
+        // Calculate loss
         let loss = self.loss_fn.calculate(&predictions, targets);
 
-        // --- Backward pass ---
+        // Backward pass
         // Calculate initial gradient: dError/dZ_L for the last layer L
         let mut d_error_dz: DMatrix<f32>;
         let last_layer_idx = self.layers.len() - 1;
@@ -65,7 +64,7 @@ impl NeuralNetwork {
         } else {
             // General case: dError/dZ_L = dError/dA_L * dA_L/dZ_L
             let d_error_da = self.loss_fn.derivative(&predictions, targets); 
-            // Accessing z_cache is now allowed as it's public. Clone to avoid mutable borrow conflicts.
+            // Bad: Cloning z_cache every time is expensive, but I couldn't get a mutable reference to it
             let last_layer_z_cache = self.layers[last_layer_idx].z_cache.clone(); 
             let da_dz = self.layers[last_layer_idx].activation_fn.derivative(&last_layer_z_cache); 
             d_error_dz = d_error_da.component_mul(&da_dz); 

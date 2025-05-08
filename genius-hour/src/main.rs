@@ -75,13 +75,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         nn = NeuralNetwork::new(LossFunction::CrossEntropy);
         nn.add_layer(DenseLayer::new(
             IMAGE_FEATURE_SIZE,
-            128,
+            128, // Hidden Layer 1: 128 neurons
             ActivationFunction::ReLU,
         ));
-        nn.add_layer(DenseLayer::new(128, 64, ActivationFunction::ReLU));
+        nn.add_layer(DenseLayer::new(
+            128,
+            64,  // Hidden Layer 2: 64 neurons
+            ActivationFunction::ReLU,
+        ));
         nn.add_layer(DenseLayer::new(
             64,
-            NUM_CLASSES,
+            NUM_CLASSES, // Output Layer: 10 neurons
             ActivationFunction::Softmax,
         ));
 
@@ -97,9 +101,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("Train labels (one-hot): {}x{}", train_labels_one_hot.nrows(), train_labels_one_hot.ncols());
 
         // --- Training Hyperparameters ---
-        let epochs = 30; // Or fewer if just testing save/load
+        let epochs = 5; // Or fewer if just testing save/load
         let learning_rate = 0.01;
-        let batch_size = 64;
+        let batch_size = 1;
 
         println!("\nStarting training...");
         println!("Epochs: {}, Learning Rate: {}, Batch Size: {}", epochs, learning_rate, batch_size);
@@ -149,7 +153,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
 
-    // --- Inference/Evaluation part (can run always, on new or loaded model) ---
+    // --- Inference/Evaluation part ---
     println!("\nEvaluating final model performance...");
     let test_images_path = "mnist/t10k-images.idx3-ubyte";
     let test_labels_path = "mnist/t10k-labels.idx1-ubyte";
