@@ -19,16 +19,16 @@ export default function Writeup() {
         <li><Code>src/lib.rs</Code>: This file serves as the library's main entry point for WebAssembly compilation. WebAssembly is a binary format that can run in the browser, allowing me to have a browser-based demo that doesn't need a server. When compiling the library for WASM, it includes the pretrained MNIST model in the output binary, using Rust's <Code>include_bytes!</Code> macro. The main export of this file is the <Code>predict_mnist</Code> function. This function can be called from JavaScript to perform inference in the browser, enabling the demo. </li>
       </ul>
 
-      <h2 className="text-xl font-bold mt-4">Key Features</h2>
+      {/* <h2 className="text-xl font-bold mt-4">Key Features</h2>
       <ul className="list-disc list-inside text-left w-full pl-12 space-y-1">
-        <li><strong>Modular Design:</strong> The codebase is well-structured into modules like <Code>network</Code>, <Code>layer</Code>, <Code>activation</Code>, and <Code>loss</Code>, promoting clarity and maintainability.</li>
+        <li><strong>Modular Design:</strong> The codebase is well-structured into modules like <Code>network</Code>, <Code>layer</Code>, <Code>activation</Code>, and <Code>loss</Code></li>
         <li><strong>Customizable Network Architecture:</strong> The <Code>NeuralNetwork</Code> struct supports an arbitrary number of <Code>DenseLayer</Code> instances, each with a configurable number of neurons and activation functions.</li>
         <li><strong>Backpropagation from Scratch:</strong> The training process, including the forward and backward passes (backpropagation), is implemented manually, demonstrating a fundamental understanding of neural network mechanics.</li>
         <li><strong>Multiple Activation and Loss Functions:</strong> The network supports various activation functions (ReLU, Sigmoid, Softmax, Linear) and loss functions (Cross-Entropy, Mean Squared Error), allowing flexibility for different types of problems.</li>
         <li><strong>Model Persistence:</strong> Implemented functionality to save trained model weights to a file and load them later, which is essential for reusing models without retraining. This is handled in <Code>serialization.rs</Code>.</li>
         <li><strong>MNIST Dataset Handling:</strong> Includes utilities (in <Code>mnist_loader.rs</Code>, referenced by <Code>main.rs</Code>) for loading and preprocessing the MNIST dataset for training and testing.</li>
         <li><strong>Batch Training:</strong> Batch training is implemented, but has very poor performance for some reason. I couldn't figure out why, so I ended up training without batching. If I can figure out the issue, batching will greatly improve the speed of training the model. </li>
-      </ul>
+      </ul> */}
 
       <h2 className="text-xl font-bold mt-4">Improvements</h2>
       <p className="text-left w-full pl-8">Currently, the performance of the demo is ok, but it sometimes makes mistakes, even when the number looks very clear. One significant improvement would be to implement a more advanced optimization algorithm, such as the Adam optimizer. Right now, we use basic stochastic gradient descent, which is essentially what we learned in class for multivariable optimization problems. Adam can lead to better model accuracy. When training a neural net, the learning rate influences the speed we go "down the gradient". If the learning rate is too high, the model will continue to overshoot the minimum (loss), and if it is too low, it may take too long to converge and find the minimum. Adam can help with this by adapting the learning rate for each parameter, rather than globally. </p>
