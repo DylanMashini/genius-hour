@@ -35,6 +35,12 @@ export default function Writeup() {
 
       <h2 className="text-xl font-bold mt-4">Other Considerations</h2>
       <p className="text-left w-full pl-8">When I was trying to figure out why the model wasn't performing as well as I would've liked it to in the demo, I realized that there is a subtle difference between the task I trained the model for, and the task the model is expected to perform. The MNIST dataset is a collection of 28x28 pixel images of handwritten digits in greyscale (0-255). The demo however, is a collection of 28x28 pixel images of digits in black and white. This means that in the training data, each pixel has different intensities, but in the demo every pixel is either 0 or 255. This slight difference in data could contribute to the model's confusion. </p>
+
+      <h2 className="text-xl font-bold mt-4">Sources I Used</h2>
+      <ul className="list-disc list-inside text-left w-full pl-12 space-y-1">
+        <li><a href="https://www.amazon.com/Make-Your-Own-Neural-Network-ebook/dp/B01EER4Z4G?crid=3EBZJCALUWB6N&dib=eyJ2IjoiMSJ9.gCZEQ0Vi7PwyWIxt2o8G8tDCEGsLf6ZVtXT0WIAQ7x7Wulfe5qaXvN1FRBg1ACbFQlanmwKH_0Lf-bhKOHz_CKTa_kBe2hpdPD0m6LlTlX5p5Ce9AHZTdgUQAlhOFxOT7kH-MW230t_pG_3LgvaG2_3sXrNK5KkWQSmrlI4CmmNtT4MX9-JtBxKuNGuT5pAycrERJPpkZSY21zj3-M9H1ninnaLOgE_fwqQFNoZ5y_0.FgUYb1BC_ZYqUffDG34aHUeNvzEiMoHGrKtqkFU2yoQ&dib_tag=se&keywords=train+neural+networks&qid=1746724987&sprefix=train+nueral+networks%2Caps%2C71&sr=8-6" target="_blank" rel="noopener noreferrer">Make Your Own Neural Network</a> by Tariq Rashid</li>
+        <li><a href="https://www.3blue1brown.com/topics/neural-networks" target="_blank" rel="noopener noreferrer">3Blue1Brown Neural Networks Series</a></li>
+      </ul>
     </div>
 
   );
