@@ -97,7 +97,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("Train labels (one-hot): {}x{}", train_labels_one_hot.nrows(), train_labels_one_hot.ncols());
 
         // --- Training Hyperparameters ---
-        let epochs = 1; // Or fewer if just testing save/load
+        let epochs = 30; // Or fewer if just testing save/load
         let learning_rate = 0.01;
         let batch_size = 64;
 

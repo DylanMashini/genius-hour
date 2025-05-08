@@ -6,7 +6,7 @@
   </head>
   <body>
     <script type="module">
-      import init from "./pkg/genius_hour.js";
+      import init, {predict_mnist} from "./pkg/genius_hour.js";
       init().then(() => {
         predict_mnist();
       });
