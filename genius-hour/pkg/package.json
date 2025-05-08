@@ -8,11 +8,13 @@
   "files": [
     "genius_hour_bg.wasm",
     "genius_hour.js",
+    "genius_hour_bg.js",
     "genius_hour.d.ts"
   ],
   "main": "genius_hour.js",
   "types": "genius_hour.d.ts",
   "sideEffects": [
+    "./genius_hour.js",
     "./snippets/*"
   ]
 }
