@@ -168,6 +168,7 @@ function App() {
       <header>
         <h1 className="text-[#61dafb] mb-2 text-4xl">Genius Hour Demo</h1>
         <p className="text-neutral-400 text-lg mt-0 mb-4">Draw a digit between 0 and 9, and the model will try to predict what digit you drew. </p>
+        <p className="text-neutral-400 text-sm italic">Hint: For best results, draw digits in the center of the canvas with some padding around the edges.</p>
       </header>
 
       <main className="flex flex-col gap-6">
