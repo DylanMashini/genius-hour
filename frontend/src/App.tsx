@@ -56,14 +56,14 @@ function App() {
     ctx.strokeStyle = '#333'; // Dark gray grid lines
     ctx.lineWidth = 0.5;
     for (let i = 0; i <= MNIST_SIZE; i++) {
-        ctx.beginPath();
-        ctx.moveTo(i * PIXEL_SCALE, 0);
-        ctx.lineTo(i * PIXEL_SCALE, DISPLAY_CANVAS_SIZE);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(0, i * PIXEL_SCALE);
-        ctx.lineTo(DISPLAY_CANVAS_SIZE, i * PIXEL_SCALE);
-        ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(i * PIXEL_SCALE, 0);
+      ctx.lineTo(i * PIXEL_SCALE, DISPLAY_CANVAS_SIZE);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, i * PIXEL_SCALE);
+      ctx.lineTo(DISPLAY_CANVAS_SIZE, i * PIXEL_SCALE);
+      ctx.stroke();
     }
 
   }, [gridData]);
@@ -93,13 +93,13 @@ function App() {
     if (coords) {
       const { gridX, gridY } = coords;
       const index = gridY * MNIST_SIZE + gridX;
-      
+
       // Create a new array to trigger re-render
       setGridData(prevGridData => {
         const newGridData = [...prevGridData];
         // Toggle pixel: if you want to erase, you'd need a different logic or modifier key
         // For now, drawing always sets to white (1)
-        newGridData[index] = 1; 
+        newGridData[index] = 1;
         return newGridData;
       });
     }
@@ -139,7 +139,7 @@ function App() {
     // MNIST typically expects 0.0 for black and 1.0 for white.
     // Our gridData: 0 for black, 1 for white. So this matches.
     const processedData = new Float32Array(gridData);
-    
+
     // console.log("Processed Data Sample (first 10):", Array.from(processedData.slice(0,10)));
 
     try {
@@ -196,7 +196,7 @@ function App() {
           <button
             onClick={clearCanvas}
             disabled={isLoading}
-            className="text-white border-none py-[0.8rem] px-6 rounded-md text-base font-bold cursor-pointer transition-colors duration-200 ease-in-out transition-transform duration-100 ease hover:enabled:bg-[#d33c23] hover:enabled:-translate-y-0.5 active:enabled:translate-y-0 disabled:bg-[#555555] disabled:text-[#888888] disabled:cursor-not-allowed"
+            className="text-white border-none py-[0.8rem] px-6 rounded-md text-base font-bold cursor-pointer transition-colors duration-200 ease-in-out ease hover:enabled:bg-[#d33c23] hover:enabled:-translate-y-0.5 active:enabled:translate-y-0 disabled:bg-[#555555] disabled:text-[#888888] disabled:cursor-not-allowed"
           >
             Clear Canvas
           </button>
@@ -207,17 +207,14 @@ function App() {
             <h2 className="m-0 text-2xl text-neutral-400">Predicted Digit: <span className="text-5xl font-bold text-[#4caf50] inline-block ml-2">{result}</span></h2>
           </div>
         )}
-                {/* Render the ProbabilityChart */}
-                {probabilities && result !== null && (
+        {/* Render the ProbabilityChart */}
+        {probabilities && result !== null && (
           <ProbabilityChart probabilities={probabilities} predictedDigit={result} />
         )}
 
         {!isWasmReady && <p className="text-neutral-400 italic">WASM module is loading, please wait...</p>}
       </main>
 
-      <footer className="mt-8 pt-4 border-t border-neutral-700 text-sm text-neutral-400">
-        <p>Powered by Rust (WASM) & React</p>
-      </footer>
       <Writeup />
     </div>
   );
